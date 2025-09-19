@@ -230,24 +230,24 @@ export default function App() {
               />
             </div>
             <div className="flex justify-end">
-                <button
+              <button
                 onClick={handleSearch}
                 disabled={!selectedState || !selectedDistrict || !selectedCommodity}
                 className="flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg shadow-md transition duration-300 ease-in-out disabled:bg-gray-400 disabled:cursor-not-allowed"
-                >
+              >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.3-4.3"></path>
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.3-4.3"></path>
                 </svg>
                 <span>Search</span>
-                </button>
+              </button>
             </div>
           </div>
 
           <div className="mt-8 overflow-x-auto">
             {filteredData.length > 0 ? (
               <div className="rounded-lg shadow-lg overflow-hidden border border-gray-200">
-                <table className="w-full border-collapse">
+                <table className="min-w-[700px] w-full border-collapse">
                   <thead>
                     <tr className="bg-green-600 text-white">
                       <th className="p-4 text-left">Market</th>
@@ -260,7 +260,10 @@ export default function App() {
                   </thead>
                   <tbody>
                     {filteredData.map((item, idx) => (
-                      <tr key={idx} className="border-b last:border-b-0 hover:bg-green-50 transition duration-150 ease-in-out">
+                      <tr
+                        key={idx}
+                        className="border-b last:border-b-0 hover:bg-green-50 transition duration-150 ease-in-out"
+                      >
                         <td className="p-4">{item.market}</td>
                         <td className="p-4">{item.commodity}</td>
                         <td className="p-4">{item.variety}</td>
@@ -274,13 +277,13 @@ export default function App() {
               </div>
             ) : (
               <p className="text-gray-600 text-center py-8">
-                {selectedState && selectedDistrict && selectedCommodity ? 
-                  "No results found for your selection." : 
-                  "Please select a state, district, and commodity to search."
-                }
+                {selectedState && selectedDistrict && selectedCommodity
+                  ? "No results found for your selection."
+                  : "Please select a state, district, and commodity to search."}
               </p>
             )}
           </div>
+
         </>
       )}
     </div>
