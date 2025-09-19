@@ -9,10 +9,10 @@ export async function POST(req) {
       return NextResponse.json({ error: "Text required" }, { status: 400 });
     }
 
-    // Parse GOOGLE_CREDENTIALS from Vercel env
+    // Parse credentials from env
     const rawCredentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
 
-    // Fix private_key formatting (\n → real newlines)
+    // Fix private key newlines
     rawCredentials.private_key = rawCredentials.private_key.replace(/\\n/g, "\n");
 
     const auth = new GoogleAuth({
