@@ -11,7 +11,7 @@ const Spinner = () => (
 );
 
 // Custom Searchable Dropdown Component
-const SearchableDropdown = ({ options, value, onChange, placeholder, isDisabled }) => {
+const SearchableDropdown = ({ options = [], value, onChange, placeholder, isDisabled }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState(value?.label || "");
   const [filteredOptions, setFilteredOptions] = useState(options);
@@ -24,7 +24,7 @@ const SearchableDropdown = ({ options, value, onChange, placeholder, isDisabled 
     if (inputValue) {
       setFilteredOptions(
         options.filter((option) =>
-          option.label.toLowerCase().includes(inputValue.toLowerCase())
+          option?.label?.toLowerCase().includes(inputValue.toLowerCase())
         )
       );
     } else {
@@ -116,7 +116,8 @@ export default function App() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const API_URL = "https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=579b464db66ec23bdd000001cdc3b564546246a772a26393094f5645&offset=0&limit=all&format=json";
+        const API_URL =
+          "https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=579b464db66ec23bdd000001cdc3b564546246a772a26393094f5645&offset=0&limit=all&format=json";
         const res = await fetch(API_URL);
         const json = await res.json();
 
@@ -129,10 +130,9 @@ export default function App() {
         const normalized = json.records.map(normalizeRecord);
         setRecords(normalized);
 
-        // Populate the state dropdown options
-        const uniqueStates = [...new Set(normalized.map((r) => r.state))].sort();
+        // Populate the state dropdown options (filter out empty values)
+        const uniqueStates = [...new Set(normalized.map((r) => r.state).filter(Boolean))].sort();
         setStates(uniqueStates.map((s) => ({ value: s, label: s })));
-
       } catch (err) {
         console.error("API fetch error:", err);
       } finally {
@@ -146,7 +146,7 @@ export default function App() {
   useEffect(() => {
     if (selectedState) {
       const filteredDistricts = records.filter(r => r.state === selectedState);
-      const uniqueDistricts = [...new Set(filteredDistricts.map(r => r.district))].sort();
+      const uniqueDistricts = [...new Set(filteredDistricts.map(r => r.district).filter(Boolean))].sort();
       setDistricts(uniqueDistricts.map(d => ({ value: d, label: d })));
     } else {
       setDistricts([]);
@@ -158,7 +158,7 @@ export default function App() {
   useEffect(() => {
     if (selectedState && selectedDistrict) {
       const filteredCommodities = records.filter(r => r.state === selectedState && r.district === selectedDistrict);
-      const uniqueCommodities = [...new Set(filteredCommodities.map(r => r.commodity))].sort();
+      const uniqueCommodities = [...new Set(filteredCommodities.map(r => r.commodity).filter(Boolean))].sort();
       setCommodities(uniqueCommodities.map(c => ({ value: c, label: c })));
     } else {
       setCommodities([]);
@@ -244,37 +244,78 @@ export default function App() {
             </div>
           </div>
 
-          <div className="mt-8 overflow-x-auto">
+          {/* Results: desktop/table + mobile cards */}
+          <div className="mt-8">
             {filteredData.length > 0 ? (
-              <div className="rounded-lg shadow-lg overflow-hidden border border-gray-200">
-                <table className="min-w-[700px] w-full border-collapse">
-                  <thead>
-                    <tr className="bg-green-600 text-white">
-                      <th className="p-4 text-left">Market</th>
-                      <th className="p-4 text-left">Commodity</th>
-                      <th className="p-4 text-left">Variety</th>
-                      <th className="p-4 text-left">Min Price</th>
-                      <th className="p-4 text-left">Max Price</th>
-                      <th className="p-4 text-left">Modal Price</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredData.map((item, idx) => (
-                      <tr
-                        key={idx}
-                        className="border-b last:border-b-0 hover:bg-green-50 transition duration-150 ease-in-out"
-                      >
-                        <td className="p-4">{item.market}</td>
-                        <td className="p-4">{item.commodity}</td>
-                        <td className="p-4">{item.variety}</td>
-                        <td className="p-4 text-right">₹{item.min_price}</td>
-                        <td className="p-4 text-right">₹{item.max_price}</td>
-                        <td className="p-4 text-right">₹{item.modal_price}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <>
+                {/* TABLE VIEW for md+ (scrollable horizontally) */}
+                <div className="hidden md:block rounded-lg shadow-lg border border-gray-200">
+                  <div className="overflow-x-auto">
+                    <table className="min-w-[900px] w-full border-collapse">
+                      <thead>
+                        <tr className="bg-green-600 text-white">
+                          <th className="p-4 text-left">Market</th>
+                          <th className="p-4 text-left">Commodity</th>
+                          <th className="p-4 text-left">Variety</th>
+                          <th className="p-4 text-left">Min Price</th>
+                          <th className="p-4 text-left">Max Price</th>
+                          <th className="p-4 text-left">Modal Price</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredData.map((item, idx) => (
+                          <tr key={idx} className="border-b last:border-b-0 hover:bg-green-50 transition duration-150 ease-in-out">
+                            <td className="p-4 whitespace-nowrap">{item.market}</td>
+                            <td className="p-4 whitespace-nowrap">{item.commodity}</td>
+                            <td className="p-4 whitespace-nowrap">{item.variety}</td>
+                            <td className="p-4 text-right whitespace-nowrap">₹{item.min_price}</td>
+                            <td className="p-4 text-right whitespace-nowrap">₹{item.max_price}</td>
+                            <td className="p-4 text-right whitespace-nowrap">₹{item.modal_price}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* MOBILE CARD VIEW for small screens */}
+                <div className="md:hidden space-y-4">
+                  {filteredData.map((item, idx) => (
+                    <div key={idx} className="bg-white p-4 rounded-lg shadow border border-gray-200">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <div className="text-sm text-gray-600">Market</div>
+                          <div className="font-semibold text-gray-800">{item.market}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm text-gray-600">Modal</div>
+                          <div className="font-semibold text-gray-800">₹{item.modal_price}</div>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 grid grid-cols-2 gap-2 text-sm text-gray-700">
+                        <div>
+                          <div className="text-xs text-gray-500">Commodity</div>
+                          <div className="font-medium">{item.commodity}</div>
+                        </div>
+                        <div>
+                          <div className="text-xs text-gray-500">Variety</div>
+                          <div className="font-medium">{item.variety}</div>
+                        </div>
+
+                        <div>
+                          <div className="text-xs text-gray-500">Min Price</div>
+                          <div className="font-medium">₹{item.min_price}</div>
+                        </div>
+                        <div>
+                          <div className="text-xs text-gray-500">Max Price</div>
+                          <div className="font-medium">₹{item.max_price}</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
             ) : (
               <p className="text-gray-600 text-center py-8">
                 {selectedState && selectedDistrict && selectedCommodity
@@ -283,7 +324,6 @@ export default function App() {
               </p>
             )}
           </div>
-
         </>
       )}
     </div>
