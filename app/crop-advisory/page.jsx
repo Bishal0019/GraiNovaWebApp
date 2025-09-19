@@ -399,9 +399,9 @@ export default function CropAdvisoryPage() {
                     {/* Advice + TTS Controls */}
                     {advice && (
                         <div className="mt-8 p-6 bg-green-50 rounded-lg border-l-4 border-green-600 shadow-sm transition-all duration-300">
-                            <h2 className="text-xl font-bold text-green-800 mb-3 flex justify-between items-center">
-                                Our Recommendation:
-                                <div className="flex gap-2">
+                            <h2 className="text-xl font-bold text-green-800 mb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                <span>Our Recommendation:</span>
+                                <div className="flex flex-wrap gap-2">
                                     <button
                                         onClick={handleSpeak}
                                         className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-sm"
