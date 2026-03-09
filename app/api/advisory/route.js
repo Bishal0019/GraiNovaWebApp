@@ -108,7 +108,7 @@ export async function POST(req) {
             ---
         `;
 
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+        const model = genAI.getGenerativeModel({ model: "gemini-3-flash" });
         console.log("Attempting to generate content with Gemini...");
         
         const result = await model.generateContent(promptTemplate);
